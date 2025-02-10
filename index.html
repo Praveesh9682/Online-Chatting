@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +12,7 @@
         <h1>Private Chat App</h1>
         <input type="text" id="room" placeholder="Enter Room Name" required>
         <ul id="messages"></ul>
-        <form id="form">
+        <form id="form" action="javascript:void(0);">
             <input id="input" autocomplete="off" placeholder="Type a message..." required />
             <button type="submit">Send</button>
         </form>
@@ -19,7 +20,7 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
+        const socket = io({ transports: ['websocket'] }); // Force WebSocket transport
         const form = document.getElementById('form');
         const input = document.getElementById('input');
         const messages = document.getElementById('messages');
@@ -38,15 +39,19 @@
 
         // Prevent form submission from refreshing the page
         form.addEventListener('submit', (e) => {
-            e.preventDefault(); // Prevents page refresh
+            e.preventDefault();
             const message = input.value.trim();
-            
             if (message !== '' && currentRoom !== '') {
                 socket.emit('chatMessage', { room: currentRoom, message });
+
+                const item = document.createElement('li');
+                item.textContent = `You: ${message}`;
+                messages.appendChild(item);
+
                 input.value = '';
-                input.focus(); // Auto-focus input after sending
-            } else if (currentRoom === '') {
-                alert('⚠️ Please enter a room name before sending a message.');
+                input.focus();
+            } else {
+                alert('Please enter a room name before sending a message.');
             }
         });
 
@@ -55,7 +60,7 @@
             const item = document.createElement('li');
             item.textContent = msg;
             messages.appendChild(item);
-            messages.scrollTop = messages.scrollHeight; // Auto-scroll to the latest message
+            messages.scrollTop = messages.scrollHeight;
         });
     </script>
 </body>
