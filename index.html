@@ -38,12 +38,15 @@
 
         // Prevent form submission from refreshing the page
         form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (input.value.trim() !== '' && currentRoom !== '') {
-                socket.emit('chatMessage', { room: currentRoom, message: input.value });
+            e.preventDefault(); // Prevents page refresh
+            const message = input.value.trim();
+            
+            if (message !== '' && currentRoom !== '') {
+                socket.emit('chatMessage', { room: currentRoom, message });
                 input.value = '';
-            } else {
-                alert('Please enter a room name before sending a message.');
+                input.focus(); // Auto-focus input after sending
+            } else if (currentRoom === '') {
+                alert('⚠️ Please enter a room name before sending a message.');
             }
         });
 
